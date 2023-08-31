@@ -1,0 +1,25 @@
+trigger:
+- master  # Define the branch that triggers the pipeline
+
+pool:
+  vmImage: 'windows-latest'  # Agent pool name
+
+jobs:
+- job: RunToadScript
+  pool:
+    name: ABJ  # Agent pool name
+    demands: abjtest  # Agent name
+    
+  steps:
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      installationPath: $(Agent.ToolsDirectory)/dotnet
+    
+  - powershell: |
+      # Your PowerShell script execution commands here
+      Invoke-Expression "C:\Users\adminCF\Downloads\toad-main\Toad\tdt.exe -ScriptPath C:\Users\adminCF\Downloads\toad-main\ExecuteAllScripts.ps1 -Instance TargetInstanceName"
+      #Invoke-Expression -Command "& '$toadDirectory\tdt.exe' -batch -runscript=`"$scriptPath`"" -debug 2>&1 | Out-File -FilePath $logFilePath -Append
+    displayName: 'Execute Toad PowerShell Script'
+    env:
+      TOAD_HOME: 'C:\Users\adminCF\Downloads\toad-main\Toad'
